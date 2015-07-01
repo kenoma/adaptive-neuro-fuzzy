@@ -45,6 +45,7 @@
     <Compile Include="membership\GaussianRule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerializationHelper.cs" />
+    <Compile Include="training\QPropTraining.cs" />
     <Compile Include="training\BatchBackpropTraining.cs" />
     <Compile Include="training\BackpropTraining.cs" />
   </ItemGroup>

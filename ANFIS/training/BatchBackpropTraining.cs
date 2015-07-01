@@ -13,8 +13,7 @@ namespace ANFIS.training
         double lastError = double.MaxValue;
         double threshold = 0.0;
         bool isStop = false;
-
-        
+               
 
         public BatchBackpropTraining(double LearningRate, double threshold)
         {
@@ -72,20 +71,7 @@ namespace ANFIS.training
 
                     for (int p = 0; p < grad.Length; p++)
                     {
-
-                        double g = 0.0;
-
-                        for (int C = 0; C < outputDim; C++)
-                        {
-                            double subSum = 0.0;
-                            for (int i = 0; i < numOfRules; i++)
-                                subSum += (i == rule ?
-                                    (grad[p] * (1.0 / firingSum - firings[rule] / (firingSum * firingSum))) :
-                                    (-firings[rule] * grad[p] / (firingSum * firingSum))) * z[i][C];
-
-
-                            g += (o[C] - y[sample][C]) * subSum;
-                        }
+                        double g = dEdP(y[sample], o, z, firings, grad, firingSum, rule, outputDim, numOfRules, p);
                         p_accum[rule][p] += g;
                     }
                 }
@@ -158,6 +144,32 @@ namespace ANFIS.training
             }
 
             return globalError / x.Length;
+        }
+
+        private static double dEdP(double[] y, double[] o,
+           double[][] z,
+           double[] firings,
+           double[] grad,
+           double firingSum,
+           int rule,
+           int outputDim,
+           int numOfRules,
+           int p)
+        {
+            double g = 0.0;
+
+            for (int C = 0; C < outputDim; C++)
+            {
+                double subSum = 0.0;
+                for (int i = 0; i < numOfRules; i++)
+                    subSum += (i == rule ?
+                        (grad[p] * (1.0 / firingSum - firings[rule] / (firingSum * firingSum))) :
+                        (-firings[i] * grad[p] / (firingSum * firingSum))) * z[i][C];
+
+
+                g += (o[C] - y[C]) * subSum;
+            }
+            return g;
         }
     }
 }
