@@ -13,49 +13,31 @@ namespace ANFIS
     {
         private int inputDim, outputDim, numOfRules;
         
-        private ITerm[] terms;
+        private IRule[] ruleBase;
 
-        /// <summary>
-        /// Consequent parts of rules
-        /// </summary>
-        private double[][] z;
+        public IRule[] RuleBase { get { return ruleBase; } set { ruleBase = value; } }
 
-        public ANFIS(ITerm[] InitialTermSet)
+        public ANFIS(IRule[] RuleSet)
         {
-            if (InitialTermSet == null || InitialTermSet.Length == 0)
+            if (RuleSet == null || RuleSet.Length == 0)
                 throw new Exception("Ruleset is empty");
-            this.numOfRules = InitialTermSet.Length;
-            terms = InitialTermSet;
+            this.numOfRules = RuleSet.Length;
+            ruleBase = RuleSet;
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="x">Input values</param>
-        /// <param name="y">Desired output</param>
-        public void TrainAFIS(double[][] x, double[][] y, ITraining TrainingAlgo)
-        {
-            int epoch = 0;
-            do
-            {
-                double Error = TrainingAlgo.Iteration(x, y, z, terms);
-                Console.WriteLine("[{0}] Epoch {1}, Error {2}\t", DateTime.Now, epoch++, Error);
-
-            } while (!TrainingAlgo.isTrainingstoped());
-            Console.WriteLine("Training done");
-        }
-
 
         public double[] Inference(double[] x)
         {
             if (x.Length != inputDim)
                 throw new Exception("Wrong input dimension");
 
-            return Inference(x, z, terms, numOfRules, outputDim);
+            return Inference(x, ruleBase);
         }
 
-        public static double[] Inference(double[] x, double[][] z, ITerm[] terms, int NumOfRules, int OutputDim)
+        public static double[] Inference(double[] x, IRule[] terms)
         {
+            int NumOfRules = terms.Length;
+            int OutputDim = terms[0].Z.Length;
+
             double[] firings = new double[NumOfRules];
             double[] y = new double[OutputDim];
             double firingSum = 0.0;
@@ -68,7 +50,7 @@ namespace ANFIS
 
             for (int i = 0; i < NumOfRules; i++)
                 for (int C = 0; C < OutputDim; C++)
-                    y[C] += firings[i] / firingSum * z[i][C];
+                    y[C] += firings[i] / firingSum * terms[i].Z[C];
 
 
             return y;

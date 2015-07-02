@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ANFIS.misc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ANFIS.membership
 {
-    public class GaussianTerm : ITerm
+    public class GaussianRule : IRule
     {
         int xdim;
 
@@ -15,17 +16,25 @@ namespace ANFIS.membership
         /// xdim :: 2*xdim-1 = Scaling
         /// </summary>
         double[] parameters;
+        double[] z;
 
-        public GaussianTerm(double[] Centroid, double[] Scaling)
+        public void Init(double[] Centroid, double[] Consequence, double[] NearestNeighb)
         {
-            if (Centroid == null || Centroid.Length == 0 || Scaling == null || Scaling.Length != Centroid.Length)
+            if (Centroid == null || Centroid.Length == 0 || Consequence == null)
                 throw new Exception("Incorrect membership function initialization");
 
             xdim = Centroid.Length;
             parameters = new double[xdim * 2];
             Array.Copy(Centroid, parameters, xdim);
-            Array.Copy(Scaling, 0, parameters, xdim, xdim);
+
+            double[] gwidths = Centroid.Select((v, i) => 0.25 * Math.Max(1e-3, Math.Abs(Centroid[i] - NearestNeighb[i]))).ToArray();
+
+            Array.Copy(gwidths, 0, parameters, xdim, xdim);
+            z = Consequence.ToArray();
         }
+
+      
+
 
         public double[] Parameters
         {
@@ -36,6 +45,18 @@ namespace ANFIS.membership
             set
             {
                 parameters = value;
+            }
+        }
+
+        public double[] Z
+        {
+            get
+            {
+                return z;
+            }
+            set
+            {
+                z = value;
             }
         }
 

@@ -16,8 +16,9 @@ namespace ANFIS
         /// <param name="z">consequent parts of rules</param>
         /// <param name="terms">Rulebase</param>
         /// <returns>Iteration Error</returns>
-        double Iteration(double[][] x, double[][] y, double[][] z, ITerm[] terms);
-        double Error(double[][] x, double[][] y, double[][] z, ITerm[] terms);
+        double Iteration(double[][] x, double[][] y, IRule[] terms);
+        double Error(double[][] x, double[][] y, IRule[] terms);
+        
         bool isTrainingstoped();
     }
 }
