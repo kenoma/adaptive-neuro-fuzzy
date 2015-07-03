@@ -6,8 +6,16 @@ using System.Threading.Tasks;
 
 namespace ANFIS.rextractors
 {
-    public class KMEANSExtractor : IRuleExtractor
+    public class KMEANSExtractorIO : IRuleExtractor
     {
+
+        public int RuleNumbers { get; set; }
+
+        public KMEANSExtractorIO(int RuleNumbers)
+        {
+            this.RuleNumbers = RuleNumbers;
+        }
+
         /// <summary>
         /// before clustering each output vector appended to input vector
         /// after clustering we obtain initial rule guesses
@@ -17,7 +25,7 @@ namespace ANFIS.rextractors
         /// <param name="RuleNumbers"></param>
         /// <param name="RuleCentroids"></param>
         /// <param name="RuleConsequences"></param>
-        public void ExtractRules(double[][] input, double[][] output, int RuleNumbers, out double[][] RuleCentroids, out double[][] RuleConsequences)
+        public void ExtractRules(double[][] input, double[][] output, out double[][] RuleCentroids, out double[][] RuleConsequences)
         {
             double[][] x = new double[input.Length][];
             int inputLength = input[0].Length;

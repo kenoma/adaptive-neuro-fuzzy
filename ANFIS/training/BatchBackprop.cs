@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ANFIS.misc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,24 +7,26 @@ using System.Threading.Tasks;
 
 namespace ANFIS.training
 {
-    public class BatchBackpropTraining : ITraining
+    public class BatchBackprop : ITraining
     {
-
+        public event AdjustRuleBase AddRule;
         double learningRate = 1e-10;
         double lastError = double.MaxValue;
-        double abstol, reltol;
+        double abstol, reltol, adjustThreshold;
         bool isStop = false;
 
 
-        public BatchBackpropTraining(double LearningRate, double abstol = 1e-5, double reltol = 1e-7)
+        public BatchBackprop(double LearningRate, double abstol = 1e-5, double reltol = 1e-7, double adjustThreshold=1e-15)
         {
             this.learningRate = LearningRate;
             this.abstol = abstol;
             this.reltol = reltol;
+            this.adjustThreshold = adjustThreshold;
         }
 
-        public double Iteration(double[][] x, double[][] y, IRule[] ruleBase)
+        public double Iteration(double[][] x, double[][] y, IList<IRule> ruleBase)
         {
+Restart:
             isStop = false;
             if (x.Length != y.Length)
                 throw new Exception("Input and desired output lengths not match");
@@ -32,7 +35,7 @@ namespace ANFIS.training
 
 
             int outputDim = ruleBase[0].Z.Length;
-            int numOfRules = ruleBase.Length;
+            int numOfRules = ruleBase.Count;
 
             double[][] z_accum = new double[numOfRules][];
             double[][] p_accum = new double[numOfRules][];
@@ -41,12 +44,8 @@ namespace ANFIS.training
                 z_accum[i] = new double[outputDim];
                 p_accum[i] = new double[ruleBase[i].Parameters.Length];
             }
-
-
-
+            
             double globalError = 0.0;
-
-
             double[] firings = new double[numOfRules];
 
             for (int sample = 0; sample < x.Length; sample++)
@@ -59,12 +58,20 @@ namespace ANFIS.training
                     firings[i] = ruleBase[i].Membership(x[sample]);
                     firingSum += firings[i];
                 }
-          
+
+                if (AddRule != null && firingSum < adjustThreshold)
+                {
+                    int neig = math.NearestNeighbourhood(ruleBase.Select(z => z.Centroid).ToArray(), x[sample]);
+                    AddRule(ruleBase, x[sample], y[sample], ruleBase[neig].Centroid);
+                    Console.WriteLine("Adjusting rule base. Now {0} are in base.", ruleBase.Count);
+                    goto Restart;
+                }
+
                 for (int i = 0; i < numOfRules; i++)
                     for (int C = 0; C < outputDim; C++)
                         o[C] += firings[i] / firingSum * ruleBase[i].Z[C];
 
-                for (int rule = 0; rule < ruleBase.Length; rule++)
+                for (int rule = 0; rule < ruleBase.Count; rule++)
                 {
                     //double[] parm = terms[rule].Parameters;
                     double[] grad = ruleBase[rule].GetGradient(x[sample]);
@@ -85,7 +92,7 @@ namespace ANFIS.training
             }
 
             double escale = 0.0;
-            for (int rule = 0; rule < ruleBase.Length; rule++)
+            for (int rule = 0; rule < ruleBase.Count; rule++)
                 for (int p = 0; p < ruleBase[rule].Parameters.Length; p++)
                     escale += p_accum[rule][p] * p_accum[rule][p];
 
@@ -95,7 +102,7 @@ namespace ANFIS.training
 
             escale = Math.Sqrt(escale);
 
-            for (int rule = 0; rule < ruleBase.Length; rule++)
+            for (int rule = 0; rule < ruleBase.Count; rule++)
             {
                 double[] parm = ruleBase[rule].Parameters;
                 for (int p = 0; p < parm.Length; p++)
@@ -129,15 +136,15 @@ namespace ANFIS.training
         }
 
 
-        public double Error(double[][] x, double[][] y, IRule[] ruleBase)
+        public double Error(double[][] x, double[][] y, IList<IRule> ruleBase)
         {
             if (x.Length != y.Length)
                 throw new Exception("Input and desired output lengths not match");
-            if (ruleBase == null || ruleBase.Length==0)
+            if (ruleBase == null || ruleBase.Count == 0)
                 throw new Exception("Incorrect rulebase");
 
             int outputDim = ruleBase[0].Z.Length;
-            int numOfRules = ruleBase.Length;
+            int numOfRules = ruleBase.Count;
 
             double globalError = 0.0;
 
@@ -154,7 +161,7 @@ namespace ANFIS.training
       
 
         private static double dEdP(double[] y, double[] o,
-           IRule[] r,
+           IList<IRule> r,
            double[] firings,
            double[] grad,
            double firingSum,
@@ -177,6 +184,12 @@ namespace ANFIS.training
                 g += (o[C] - y[C]) * subSum;
             }
             return g;
+        }
+
+
+        public bool isAdjustingRules()
+        {
+            return AddRule == null;
         }
     }
 }

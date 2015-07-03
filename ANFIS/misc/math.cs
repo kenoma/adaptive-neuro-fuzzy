@@ -166,6 +166,38 @@ namespace ANFIS.misc
             }
             return candidat;
         }
+
+        public static int NearestNeighbourhood(double[][] X, int c)
+        {
+            double mindis = double.MaxValue;
+            int cand = c;
+            for (int i = 0; i < X.Length; i++)
+            {
+                double d = math.EuclidianDistance(X[c], X[i]);
+                if (i != c && d < mindis)
+                {
+                    cand = i;
+                    mindis = d;
+                }
+            }
+            return cand;
+        }
+
+        public static int NearestNeighbourhood(double[][] X, double[] c)
+        {
+            double mindis = double.MaxValue;
+            int cand = -1;
+            for (int i = 0; i < X.Length; i++)
+            {
+                double d = math.EuclidianDistance(c, X[i]);
+                if ( d < mindis)
+                {
+                    cand = i;
+                    mindis = d;
+                }
+            }
+            return cand;
+        }
     }
 
 }

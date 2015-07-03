@@ -16,6 +16,7 @@ namespace ANFIS.membership
         /// xdim :: 2*xdim-1 = Scaling
         /// </summary>
         double[] parameters;
+        double[] centroid;
         double[] z;
 
         public void Init(double[] Centroid, double[] Consequence, double[] NearestNeighb)
@@ -25,16 +26,16 @@ namespace ANFIS.membership
 
             xdim = Centroid.Length;
             parameters = new double[xdim * 2];
+            centroid = new double[xdim];
             Array.Copy(Centroid, parameters, xdim);
+            Array.Copy(Centroid, centroid, xdim);
 
-            double[] gwidths = Centroid.Select((v, i) => 0.25 * Math.Max(1e-3, Math.Abs(Centroid[i] - NearestNeighb[i]))).ToArray();
+
+            double[] gwidths = centroid.Select(t => 1.0).ToArray(); //Centroid.Select((v, i) => 0.1 * Math.Max(1e-7, Math.Abs(Centroid[i] - NearestNeighb[i]))).ToArray();
 
             Array.Copy(gwidths, 0, parameters, xdim, xdim);
             z = Consequence.ToArray();
         }
-
-      
-
 
         public double[] Parameters
         {
@@ -46,6 +47,17 @@ namespace ANFIS.membership
             {
                 parameters = value;
             }
+        }
+
+
+        public double[] Centroid
+        {
+            get
+            {
+                Array.Copy(parameters, centroid, centroid.Length);
+                return centroid;
+            }
+            set { }
         }
 
         public double[] Z
@@ -82,7 +94,6 @@ namespace ANFIS.membership
 
             for (int i = 0; i < xdim; i++)
             {
-
                 grad[i] = (point[i] - parameters[i]) * exp / pow2(parameters[i + xdim]);
                 grad[i + xdim] = pow2(point[i] - parameters[i]) * exp / (pow2(parameters[i + xdim]) * parameters[i + xdim]);
             }

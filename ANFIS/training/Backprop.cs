@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ANFIS.misc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,35 +7,37 @@ using System.Threading.Tasks;
 
 namespace ANFIS.training
 {
-    public class BackpropTraining : ITraining
+    public class Backprop : ITraining
     {
         double learningRate = 1e-10;
         double lastError = double.MaxValue;
-        double abstol,reltol;
+        double abstol, reltol, adjustThreshold;
         bool isStop = false;
 
-        public BackpropTraining(double LearningRate, double abstol = 1e-4, double reltol = 1e-5)
+        public event AdjustRuleBase AddRule;
+
+        public Backprop(double LearningRate, double abstol = 1e-4, double reltol = 1e-7, double adjustThreshold=1e-15)
         {
             this.learningRate = LearningRate;
             this.abstol = abstol;
             this.reltol = reltol;
+            this.adjustThreshold = adjustThreshold;
         }
 
-        public double Iteration(double[][] x, double[][] y,  IRule[] ruleBase)
+        public double Iteration(double[][] x, double[][] y, IList<IRule> ruleBase)
         {
+Restart:
             isStop = false;
             
             if (x.Length != y.Length)
                 throw new Exception("Input and desired output lengths not match");
-            if (ruleBase == null || ruleBase.Length == 0)
+            if (ruleBase == null || ruleBase.Count == 0)
                 throw new Exception("Incorrect rulebase");
-
+            
             int outputDim = ruleBase[0].Z.Length;
-            int numOfRules = ruleBase.Length;
+            int numOfRules = ruleBase.Count;
 
             double globalError = 0.0;
-
-
 
             double[] firings = new double[numOfRules];
 
@@ -48,12 +51,20 @@ namespace ANFIS.training
                     firings[i] = ruleBase[i].Membership(x[sample]);
                     firingSum += firings[i];
                 }
+
+                if (AddRule != null && firingSum < adjustThreshold)
+                {
+                    int neig = math.NearestNeighbourhood(ruleBase.Select(z => z.Centroid).ToArray(), x[sample]);
+                    AddRule(ruleBase, x[sample], y[sample], ruleBase[neig].Centroid);
+                    Console.WriteLine("Adjusting rule base. Now {0} are in base.", ruleBase.Count);
+                    goto Restart;
+                }
             
                 for (int i = 0; i < numOfRules; i++)
                     for (int C = 0; C < outputDim; C++)
                         o[C] += firings[i] / firingSum * ruleBase[i].Z[C];
 
-                for (int rule = 0; rule < ruleBase.Length; rule++)
+                for (int rule = 0; rule < ruleBase.Count; rule++)
                 {
                     double[] parm = ruleBase[rule].Parameters;
                     double[] grad = ruleBase[rule].GetGradient(x[sample]);
@@ -96,7 +107,7 @@ namespace ANFIS.training
         }
 
         private static double dEdP(double[] y, double[] o,
-            IRule[] z, 
+            IList<IRule> z, 
             double[] firings, 
             double[] grad, 
             double firingSum, 
@@ -127,16 +138,16 @@ namespace ANFIS.training
         }
 
 
-        public double Error(double[][] x, double[][] y, IRule[] ruleBase)
+        public double Error(double[][] x, double[][] y, IList<IRule> ruleBase)
         {
             
             if (x.Length != y.Length)
                 throw new Exception("Input and desired output lengths not match");
-            if (ruleBase == null || ruleBase.Length == 0)
+            if (ruleBase == null || ruleBase.Count == 0)
                 throw new Exception("Incorrect rulebase");
 
             int outputDim = ruleBase[0].Z.Length;
-            int numOfRules = ruleBase.Length;
+            int numOfRules = ruleBase.Count;
 
             double globalError = 0.0;
 
@@ -148,6 +159,12 @@ namespace ANFIS.training
             }
 
             return globalError / x.Length;
+        }
+
+
+        public bool isAdjustingRules()
+        {
+            return AddRule == null;
         }
     }
 }

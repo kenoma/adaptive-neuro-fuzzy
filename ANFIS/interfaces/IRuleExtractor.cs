@@ -8,6 +8,6 @@ namespace ANFIS
 {
     public interface IRuleExtractor
     {
-        void ExtractRules(double[][] input, double[][] output, int RuleNumbers, out double[][] RuleCentroids, out double[][] RuleConsequences);
+        void ExtractRules(double[][] input, double[][] output, out double[][] RuleCentroids, out double[][] RuleConsequences);
     }
 }

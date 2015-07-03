@@ -20,6 +20,11 @@ namespace ANFIS
         double[] Parameters { get; set; }
 
         /// <summary>
+        /// Centroid part of membership function
+        /// </summary>
+        double[] Centroid { get; set; }
+
+        /// <summary>
         /// Return firing level of this rule
         /// </summary>
         /// <param name="input"></param>

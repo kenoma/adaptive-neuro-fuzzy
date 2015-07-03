@@ -49,11 +49,14 @@
     <Compile Include="misc\math.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="rextractors\kmeans.cs" />
-    <Compile Include="rextractors\kmeansExtractor.cs" />
+    <Compile Include="rextractors\kmeanExtractorI.cs" />
+    <Compile Include="rextractors\kmeansExtractorIO.cs" />
     <Compile Include="misc\SerializationHelper.cs" />
-    <Compile Include="training\QPropTraining.cs" />
-    <Compile Include="training\BatchBackpropTraining.cs" />
-    <Compile Include="training\BackpropTraining.cs" />
+    <Compile Include="training\QProp.cs" />
+    <Compile Include="training\BatchBackprop.cs" />
+    <Compile Include="training\Backprop.cs" />
+    <Compile Include="training\StochasticQprop.cs" />
+    <Compile Include="training\StochasticBatch.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
