@@ -7,10 +7,9 @@ using System.Threading.Tasks;
 
 namespace ANFIS.membership
 {
-    public class GaussianRule : IRule
+    public class BellShapedRule : IRule
     {
         int xdim;
-
 
         double[] parameters;
         double[] centroid;
@@ -22,18 +21,18 @@ namespace ANFIS.membership
                 throw new Exception("Incorrect membership function initialization");
 
             xdim = Centroid.Length;
-            parameters = new double[xdim * 2];
+            parameters = new double[xdim + 2];
             centroid = new double[xdim];
             Array.Copy(Centroid, parameters, xdim);
             Array.Copy(Centroid, centroid, xdim);
 
-            double desiredVatneigb = 1e-10;
+            double small =1e-10;
             double d2 = math.EuclidianDistance2(Centroid, NearestNeighb);
-            double a = Math.Sqrt(-d2 / (2 * Math.Log(desiredVatneigb)));
+            double a = Math.Sqrt(d2) / 8;
 
-            double[] gwidths = Centroid.Select((v, i) => a).ToArray();
-
-            Array.Copy(gwidths, 0, parameters, xdim, xdim);
+            parameters[xdim] = a;
+            parameters[xdim + 1] = Math.Log((1 - small) / small) / Math.Log(d2 / (a * a));
+            
             z = Consequence.ToArray();
         }
 
@@ -79,25 +78,33 @@ namespace ANFIS.membership
         /// <returns></returns>
         public double Membership(double[] x)
         {
-            double exponent = 0.0;
+            double sum = 0.0;
             for (int i = 0; i < xdim; i++)
-                exponent += pow2((x[i] - parameters[i]) / parameters[i + xdim]);
-
-            return Math.Exp(-0.5 * exponent);
+                sum += pow2(x[i] - parameters[i]);
+            sum /= pow2(parameters[xdim]);
+            sum = Math.Pow(sum, parameters[xdim + 1]);
+            return 1.0 / (1.0 + sum);
         }
+
+        private double a { get { return parameters[xdim]; } }
+        private double b { get { return parameters[xdim + 1]; } }
 
         public double[] GetGradient(double[] point)
         {
-            double[] grad = new double[2 * xdim];
+            double[] grad = new double[xdim + 2];
 
-            double exp = Membership(point);
+            double sum = 0.0;
+            for (int i = 0; i < xdim; i++)
+                sum += pow2(point[i] - parameters[i]);
+            sum /= pow2(a);
+            double tmp = sum;
+            sum = Math.Pow(sum, b);
 
             for (int i = 0; i < xdim; i++)
-            {
-                grad[i] = (point[i] - parameters[i]) * exp / pow2(parameters[i + xdim]);
-                grad[i + xdim] = pow2(point[i] - parameters[i]) * exp / (pow2(parameters[i + xdim]) * parameters[i + xdim]);
-            }
+                grad[i] = 2.0 * sum * b * (point[i] - parameters[i]) / (pow2(1 + sum) * tmp * pow2(a));
 
+            grad[xdim] = 2.0 * sum * b / (pow2(1 + sum) * a);
+            grad[xdim + 1] = -sum * Math.Log(tmp) / pow2(1 + sum);
 
             return grad;
         }

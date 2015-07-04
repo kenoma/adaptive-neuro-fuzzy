@@ -44,6 +44,7 @@
     <Compile Include="interfaces\IRuleExtractor.cs" />
     <Compile Include="interfaces\ITerm.cs" />
     <Compile Include="interfaces\ITraining.cs" />
+    <Compile Include="membership\BellShapedRule.cs" />
     <Compile Include="membership\GaussianRule2.cs" />
     <Compile Include="membership\GaussianRule.cs" />
     <Compile Include="membership\RuleSetFactory.cs" />

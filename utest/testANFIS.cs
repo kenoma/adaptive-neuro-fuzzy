@@ -201,7 +201,7 @@ namespace utest
         [TestMethod]
         public void TestLogisticMap()
         {
-            int trainingSamples = 1000;
+            int trainingSamples = 3000;
             double[][] x = new double[trainingSamples][];
             double[][] y = new double[trainingSamples][];
             double[][] tx = new double[trainingSamples][];
@@ -233,9 +233,9 @@ namespace utest
             bbprop.AddRule += AddRule;
             QProp qprop = new QProp();
             qprop.AddRule += AddRule;
-            StochasticBatch sprop = new StochasticBatch(100, 1e-2);
+            StochasticBatch sprop = new StochasticBatch(200, 1e-2);
             sprop.AddRule += AddRule;
-            StochasticQprop sqprop = new StochasticQprop(100);
+            StochasticQprop sqprop = new StochasticQprop(200);
             sqprop.AddRule += AddRule;
 
             subtestLogisticsMap(x, y, tx, ty, bprop);
