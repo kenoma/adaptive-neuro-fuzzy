@@ -59,7 +59,7 @@ Restart:
                     Console.WriteLine("Adjusting rule base. Now {0} are in base.", ruleBase.Count);
                     goto Restart;
                 }
-            
+
                 for (int i = 0; i < numOfRules; i++)
                     for (int C = 0; C < outputDim; C++)
                         o[C] += firings[i] / firingSum * ruleBase[i].Z[C];
@@ -79,13 +79,12 @@ Restart:
 
                 for (int i = 0; i < numOfRules; i++)
                     for (int C = 0; C < outputDim; C++)
+                    {
                         ruleBase[i].Z[C] -= learningRate * (o[C] - y[sample][C]) * firings[i] / firingSum;
+                    }
 
                 for (int C = 0; C < outputDim; C++)
                     globalError += Math.Abs(o[C] - y[sample][C]);
-                if (double.IsNaN(globalError))
-                    Console.WriteLine("");
-
             }
 
             checkStop(globalError);

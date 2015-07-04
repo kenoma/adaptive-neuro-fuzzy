@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ANFIS.membership
 {
-    public class GaussianRule : IRule
+    public class GaussianRule2 : IRule
     {
         int xdim;
 
@@ -25,7 +25,7 @@ namespace ANFIS.membership
                 throw new Exception("Incorrect membership function initialization");
 
             xdim = Centroid.Length;
-            parameters = new double[xdim * 2];
+            parameters = new double[xdim + 1];
             centroid = new double[xdim];
             Array.Copy(Centroid, parameters, xdim);
             Array.Copy(Centroid, centroid, xdim);
@@ -33,10 +33,7 @@ namespace ANFIS.membership
             double desiredVatneigb = 1e-10;
             double d2 = math.EuclidianDistance2(Centroid, NearestNeighb);
             double a = Math.Sqrt(-d2 / (2 * Math.Log(desiredVatneigb)));
-
-            double[] gwidths = Centroid.Select((v, i) => a).ToArray();
-
-            Array.Copy(gwidths, 0, parameters, xdim, xdim);
+            parameters[xdim] = a;
             z = Consequence.ToArray();
         }
 
@@ -48,6 +45,7 @@ namespace ANFIS.membership
             }
             set
             {
+
                 parameters = value;
             }
         }
@@ -84,24 +82,25 @@ namespace ANFIS.membership
         {
             double exponent = 0.0;
             for (int i = 0; i < xdim; i++)
-                exponent += pow2((x[i] - parameters[i]) / parameters[i + xdim]);
+                exponent += pow2(x[i] - parameters[i]);
 
-            return Math.Exp(-0.5 * exponent);
+            double rval = Math.Exp(-0.5 * exponent / pow2(parameters[xdim]));
+
+            return rval;
         }
 
         public double[] GetGradient(double[] point)
         {
-            double[] grad = new double[2 * xdim];
+            double[] grad = new double[xdim + 1];
 
             double exp = Membership(point);
 
             for (int i = 0; i < xdim; i++)
             {
-                grad[i] = (point[i] - parameters[i]) * exp / pow2(parameters[i + xdim]);
-                grad[i + xdim] = pow2(point[i] - parameters[i]) * exp / (pow2(parameters[i + xdim]) * parameters[i + xdim]);
+                grad[i] = (point[i] - parameters[i]) * exp / pow2(parameters[xdim]);
+                grad[xdim] += pow2(point[i] - parameters[i]);
             }
-
-
+            grad[xdim] = exp * grad[xdim] / (parameters[xdim] * pow2(parameters[xdim]));
             return grad;
         }
 

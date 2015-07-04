@@ -110,6 +110,16 @@ namespace ANFIS.misc
             return candidat;
         }
 
+        static public double EuclidianDistance2(double[] inp, double[] c)
+        {
+            double dist = 0.0;
+            for (int i = 0; i < c.Length; i++)
+            {
+                double x = inp[i] - c[i];
+                dist += x * x;
+            }
+            return dist;
+        }
 
         static public double EuclidianDistance(double[] inp, double[] c)
         {

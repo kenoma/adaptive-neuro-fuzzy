@@ -15,43 +15,6 @@ namespace utest
     public class testANFIS
     {
         [TestMethod]
-        public void TestGaussianMemb()
-        {
-            double[] dumb = new double[0];
-            double[] centroid = new double[] { 0, 0, 0 };
-            double[] scaling = new double[] { 1, 1, 1 };
-            GaussianRule gterm = new GaussianRule();
-            gterm.Init(centroid, dumb, centroid.Select((v, a) => 4.0 * (centroid[a] + scaling[a])).ToArray());
-
-            double[] x = new double[3];
-            double memb = gterm.Membership(x);
-            Assert.AreEqual(1, memb, 1e-10);
-
-            x[0] = x[1] = x[2] = 1;
-
-            memb = gterm.Membership(x);
-            Assert.AreEqual(0.2231301601, memb, 1e-10);
-
-            //centroid[1] = 1;
-            //scaling[2] = 5;
-            //x[0] = 3;
-            //gterm = new GaussianRule();
-            //gterm.Init(centroid, dumb, centroid.Select((v, a) => 4.0 * (centroid[a] + scaling[a])).ToArray());
-            //memb = gterm.Membership(x);
-            //Assert.AreEqual(0.01088902367, memb, 1e-10);
-
-            //double[] grad = gterm.GetGradient(x);
-
-            //Assert.AreEqual(0.03266707101, grad[0], 1e-10);
-            //Assert.AreEqual(0, grad[1], 1e-10);
-            //Assert.AreEqual(0.0004355609468, grad[2], 1e-10);
-
-            //Assert.AreEqual(0.09800121303, grad[3], 1e-10);
-            //Assert.AreEqual(0, grad[4], 1e-10);
-            //Assert.AreEqual(0.00008711218936, grad[5], 1e-10);
-        }
-
-        [TestMethod]
         public void TestOptimization1()
         {
             Backprop bprop = new Backprop(1e-2);
@@ -95,7 +58,7 @@ namespace utest
 
         private static void subTestOptimization1(ITraining bprop, double[][] x, double[][] y, double[][] tx, double[][] ty)
         {
-            GaussianRule[] terms = new GaussianRule[] { new GaussianRule()};
+            GaussianRule2[] terms = new GaussianRule2[] { new GaussianRule2()};
             terms[0].Init(
                 new double[] { 0.5, 0.3 },
                 new double[] { 0 },
@@ -159,9 +122,9 @@ namespace utest
 
         private static void subTestOptimization2(ITraining bprop, double[][] x, double[][] y, double[][] tx, double[][] ty)
         {
-            GaussianRule[] terms = new GaussianRule[] { 
-                new GaussianRule(),
-                new GaussianRule() };
+            GaussianRule2[] terms = new GaussianRule2[] { 
+                new GaussianRule2(),
+                new GaussianRule2() };
 
             terms[0].Init(new double[] { 0.5 }, new double[2] { 1, 0 }, new double[] { 0.0 });
             terms[1].Init(new double[] { 0.0 }, new double[2] { 0, 1 }, new double[] { 0.5 });
@@ -301,7 +264,7 @@ namespace utest
             double[][] x;
             double[][] y;
             double[][] tx;
-            double[][] ty;a
+            double[][] ty;
             SampleData(IrisDataset.input, IrisDataset.output, 120, out x, out y, out tx, out ty);
 
             subtestIris(x, y, tx, ty, bprop);
@@ -338,7 +301,7 @@ namespace utest
 
         void AddRule(IList<IRule> RuleBase, double[] centroid, double[] consequence, double[] neighbourhood)
         {
-            GaussianRule rule = new GaussianRule();
+            GaussianRule2 rule = new GaussianRule2();
             rule.Init(centroid, consequence, neighbourhood);
             RuleBase.Add(rule);
         }
@@ -347,26 +310,35 @@ namespace utest
         {
             KMEANSExtractorIO extractor = new KMEANSExtractorIO(10);
             var timer = Stopwatch.StartNew();
-            ANFIS.ANFIS fis = ANFISFActory<GaussianRule>.Build(x, y, extractor, bprop, 1000);
+            ANFIS.ANFIS fis = ANFISFActory<GaussianRule2>.Build(x, y, extractor, bprop, 1000);
             timer.Stop();
 
             double err = bprop.Error(tx, ty, fis.RuleBase);
 
             Trace.WriteLine(string.Format("[{1}]\tLogistic map Error {0}\tElapsed {2}\tRuleBase {3}", err, bprop.GetType().Name, timer.Elapsed, fis.RuleBase.Length), "training");
-            Assert.IsFalse(err > 1e-1);
+            Assert.IsFalse(err > 1e-2);
         }
 
         private static void subtestIris(double[][] x, double[][] y, double[][] tx, double[][] ty, ITraining bprop)
         {
-            KMEANSExtractorI extractor = new KMEANSExtractorI(4);
+            KMEANSExtractorI extractor = new KMEANSExtractorI(15);
             var timer = Stopwatch.StartNew();
-            ANFIS.ANFIS fis = ANFISFActory<GaussianRule>.Build(x, y, extractor, bprop, 10000);
+            ANFIS.ANFIS fis = ANFISFActory<GaussianRule2>.Build(x, y, extractor, bprop, 1000);
             timer.Stop();
 
             double err = bprop.Error(tx, ty, fis.RuleBase);
 
-            Trace.WriteLine(string.Format("[{1}]\tIris Dataset Error {0}\tElapsed {2}\tRuleBase {3}", err, bprop.GetType().Name, timer.Elapsed, fis.RuleBase.Length), "training");
-            //Assert.IsFalse(err > 1e-1);
+            double correctClass = 0;
+            for (int i = 0; i < tx.Length; i++)
+            {
+                double[] o = fis.Inference(tx[i]);
+                for (int j = 0; j < ty[i].Length; j++)
+                    if (ty[i][j] == 1.0 && o[j] == o.Max())
+                        correctClass++;
+            }
+
+            Trace.WriteLine(string.Format("[{1}]\tIris Dataset Error {0} Classification Error {4}\tElapsed {2}\tRuleBase {3}", err, bprop.GetType().Name, timer.Elapsed, fis.RuleBase.Length, 1.0 - correctClass / ty.Length), "training");
+            Assert.IsFalse(ty.Length - correctClass > 2);
         }
     }
 }

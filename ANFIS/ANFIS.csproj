@@ -44,14 +44,17 @@
     <Compile Include="interfaces\IRuleExtractor.cs" />
     <Compile Include="interfaces\ITerm.cs" />
     <Compile Include="interfaces\ITraining.cs" />
+    <Compile Include="membership\GaussianRule2.cs" />
     <Compile Include="membership\GaussianRule.cs" />
     <Compile Include="membership\RuleSetFactory.cs" />
     <Compile Include="misc\math.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="rextractors\sbsctrExtractor.cs" />
     <Compile Include="rextractors\kmeans.cs" />
     <Compile Include="rextractors\kmeanExtractorI.cs" />
     <Compile Include="rextractors\kmeansExtractorIO.cs" />
     <Compile Include="misc\SerializationHelper.cs" />
+    <Compile Include="rextractors\subtrclustering.cs" />
     <Compile Include="training\QProp.cs" />
     <Compile Include="training\BatchBackprop.cs" />
     <Compile Include="training\Backprop.cs" />

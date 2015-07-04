@@ -27,9 +27,6 @@ namespace ANFIS
 
         public double[] Inference(double[] x)
         {
-            if (x.Length != inputDim)
-                throw new Exception("Wrong input dimension");
-
             return Inference(x, ruleBase);
         }
 

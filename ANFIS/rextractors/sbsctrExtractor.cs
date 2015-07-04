@@ -3,21 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using ANFIS.misc;
 namespace ANFIS.rextractors
 {
-    public class KMEANSExtractorIO : IRuleExtractor
+    public class sbstrExtractor : IRuleExtractor
     {
 
-        public int RuleNumbers { get; set; }
+        double arad, brad;
 
-        public KMEANSExtractorIO(int RuleNumbers)
+        public sbstrExtractor(double arad, double brad)
         {
-            this.RuleNumbers = RuleNumbers;
+            this.arad = arad;
+            this.brad = brad;
         }
 
         /// <summary>
-        /// before clustering each output vector appended to input vector
+        /// clustering made only for input, after this consequences are made as averaged of clustering
         /// after clustering we obtain initial rule guesses
         /// </summary>
         /// <param name="input"></param>
@@ -33,19 +34,30 @@ namespace ANFIS.rextractors
 
             for (int row = 0; row < x.Length; row++)
             {
-                x[row] = new double[inputLength+outputLength];
+                x[row] = new double[inputLength];
                 Array.Copy(input[row], x[row], inputLength);
-                Array.Copy(output[row], 0, x[row], input[row].Length, output[row].Length);
             }
-            double[][] c = kmeans.clustering(x, RuleNumbers, 3, kmeansType.kmeanspp);
-            RuleCentroids = new double[RuleNumbers][];
-            RuleConsequences = new double[RuleNumbers][];
+            double[][] c = sbsclust.SubstractiveClustering(x, arad, brad);
+            int RuleNumbers = c.Length;
+            int[] assign = new int[x.Length];
+            for (int row = 0; row < x.Length; row++)
+                assign[row] = math.DetectBucket(x[row], c);
+
+            RuleCentroids = new double[c.Length][];
+            RuleConsequences = new double[c.Length][];
+
             for (int row = 0; row < RuleNumbers; row++)
             {
                 RuleCentroids[row] = new double[inputLength];
-                RuleConsequences[row] = new double[outputLength];
+
                 Array.Copy(c[row], RuleCentroids[row], inputLength);
-                Array.Copy(c[row], inputLength, RuleConsequences[row], 0, outputLength);
+
+                RuleConsequences[row] = new double[outputLength];
+
+                var cluster = output.Select((z, i) => new { Z = z, I = assign[i] }).Where(z => z.I == row).ToArray();
+                for (int i = 0; i < outputLength; i++)
+                    RuleConsequences[row][i] = cluster.Average(z => z.Z[i]);
+
             }
         }
     }
