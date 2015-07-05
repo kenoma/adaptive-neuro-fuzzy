@@ -46,11 +46,11 @@ namespace ANFIS.training
             }
 
             double err = bprop.Iteration(subx, suby, RuleBase);
-            double globalerr = bprop.Error(x, y, RuleBase);
+            //double globalerr = bprop.Error(x, y, RuleBase);
 
-            checkStop(globalerr);
-            lastError = globalerr;
-            return globalerr;
+            checkStop(err);
+            lastError = err;
+            return err;
         }
 
         private void checkStop(double globalError)
@@ -79,7 +79,7 @@ namespace ANFIS.training
 
         public bool isAdjustingRules()
         {
-            return AddRule == null;
+            return AddRule != null;
         }
     }
 }

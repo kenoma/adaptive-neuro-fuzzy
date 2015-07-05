@@ -58,7 +58,7 @@ namespace ANFIS.membership
                 Array.Copy(parameters, centroid, centroid.Length);
                 return centroid;
             }
-            set { }
+            private set { }
         }
 
         public double[] Z
@@ -74,7 +74,7 @@ namespace ANFIS.membership
         }
 
         /// <summary>
-        /// mu = e^(- 0.5 ( (x-c)/a )^2 )
+        /// mu = e^(- 0.5 ( ||x-c||/a )^2 )
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>

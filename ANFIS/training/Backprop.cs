@@ -163,7 +163,7 @@ Restart:
 
         public bool isAdjustingRules()
         {
-            return AddRule == null;
+            return AddRule != null;
         }
     }
 }

@@ -46,10 +46,9 @@ namespace ANFIS.training
             }
 
             double err = qprop.Iteration(subx, suby, RuleBase);
-            double globalerr = qprop.Error(x, y, RuleBase);
-            checkStop(globalerr);
-            lastError = globalerr;
-            return globalerr;
+            checkStop(err);
+            lastError = err;
+            return err;
         }
 
         private void checkStop(double globalError)
@@ -78,7 +77,7 @@ namespace ANFIS.training
 
         public bool isAdjustingRules()
         {
-            return AddRule == null;
+            return AddRule != null;
         }
     }
 }

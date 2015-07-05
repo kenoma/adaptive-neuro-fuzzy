@@ -20,9 +20,9 @@ namespace ANFIS
         double[] Parameters { get; set; }
 
         /// <summary>
-        /// Centroid part of membership function
+        /// Centroid part of membership function. This is readonly property as centroid is stored in Parameters array
         /// </summary>
-        double[] Centroid { get; set; }
+        double[] Centroid { get; }
 
         /// <summary>
         /// Return firing level of this rule

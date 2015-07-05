@@ -201,7 +201,7 @@ namespace utest
         [TestMethod]
         public void TestLogisticMap()
         {
-            int trainingSamples = 3000;
+            int trainingSamples = 2000;
             double[][] x = new double[trainingSamples][];
             double[][] y = new double[trainingSamples][];
             double[][] tx = new double[trainingSamples][];
@@ -228,21 +228,39 @@ namespace utest
             }
 
             Backprop bprop = new Backprop(1e-2);
-            bprop.AddRule += AddRule;
+            bprop.AddRule += AddRule<GaussianRule2>;
             BatchBackprop bbprop = new BatchBackprop(1e-2);
-            bbprop.AddRule += AddRule;
+            bbprop.AddRule += AddRule<GaussianRule2>;
             QProp qprop = new QProp();
-            qprop.AddRule += AddRule;
-            StochasticBatch sprop = new StochasticBatch(200, 1e-2);
-            sprop.AddRule += AddRule;
-            StochasticQprop sqprop = new StochasticQprop(200);
-            sqprop.AddRule += AddRule;
+            qprop.AddRule += AddRule<GaussianRule2>;
+            StochasticBatch sprop = new StochasticBatch(500, 1e-2);
+            sprop.AddRule += AddRule<GaussianRule2>;
+            StochasticQprop sqprop = new StochasticQprop(500);
+            sqprop.AddRule += AddRule<GaussianRule2>;
 
-            subtestLogisticsMap(x, y, tx, ty, bprop);
-            subtestLogisticsMap(x, y, tx, ty, bbprop);
-            subtestLogisticsMap(x, y, tx, ty, qprop);
-            subtestLogisticsMap(x, y, tx, ty, sprop);
-            subtestLogisticsMap(x, y, tx, ty, sqprop);
+            subtestLogisticsMap<LinearRule>(x, y, tx, ty, bprop);
+            subtestLogisticsMap<LinearRule>(x, y, tx, ty, bbprop);
+            subtestLogisticsMap<LinearRule>(x, y, tx, ty, qprop);
+            subtestLogisticsMap<LinearRule>(x, y, tx, ty, sprop);
+            subtestLogisticsMap<LinearRule>(x, y, tx, ty, sqprop);
+
+            bprop = new Backprop(1e-2);
+            bprop.AddRule += AddRule<GaussianRule2>;
+            bbprop = new BatchBackprop(1e-2);
+            bbprop.AddRule += AddRule<GaussianRule2>;
+            qprop = new QProp();
+            qprop.AddRule += AddRule<GaussianRule2>;
+            sprop = new StochasticBatch(500, 1e-2);
+            sprop.AddRule += AddRule<GaussianRule2>;
+            sqprop = new StochasticQprop(500);
+            sqprop.AddRule += AddRule<GaussianRule2>;
+
+            subtestLogisticsMap<GaussianRule>(x, y, tx, ty, bprop);
+            subtestLogisticsMap<GaussianRule>(x, y, tx, ty, bbprop);
+            subtestLogisticsMap<GaussianRule>(x, y, tx, ty, qprop);
+            subtestLogisticsMap<GaussianRule>(x, y, tx, ty, sprop);
+            subtestLogisticsMap<GaussianRule>(x, y, tx, ty, sqprop);
+
         }
 
         [TestMethod]
@@ -251,15 +269,15 @@ namespace utest
             int trainingSamples = IrisDataset.input.Length;
 
             Backprop bprop = new Backprop(1e-2, abstol: 1e-4, reltol: 1e-7, adjustThreshold: 1e-20);
-            bprop.AddRule += AddRule;
+            bprop.AddRule += AddRule<GaussianRule2>;
             BatchBackprop bbprop = new BatchBackprop(1e-2, abstol: 1e-4, reltol: 1e-7, adjustThreshold: 1e-20);
-            bbprop.AddRule += AddRule;
+            bbprop.AddRule += AddRule<GaussianRule2>;
             QProp qprop = new QProp(abstol: 1e-4, reltol: 1e-7, adjustThreshold: 1e-20, InitialLearningRate: 1e-4);
-            qprop.AddRule += AddRule;
+            qprop.AddRule += AddRule<GaussianRule2>;
             StochasticBatch sprop = new StochasticBatch(40, 1e-2);
-            sprop.AddRule += AddRule;
+            sprop.AddRule += AddRule<GaussianRule2>;
             StochasticQprop sqprop = new StochasticQprop(40);
-            sqprop.AddRule += AddRule;
+            sqprop.AddRule += AddRule<GaussianRule2>;
 
             double[][] x;
             double[][] y;
@@ -299,23 +317,23 @@ namespace utest
 
         }
 
-        void AddRule(IList<IRule> RuleBase, double[] centroid, double[] consequence, double[] neighbourhood)
+        void AddRule<T>(IList<IRule> RuleBase, double[] centroid, double[] consequence, double[] neighbourhood) where T : IRule, new()
         {
-            GaussianRule2 rule = new GaussianRule2();
+            T rule = new T();
             rule.Init(centroid, consequence, neighbourhood);
             RuleBase.Add(rule);
         }
 
-        private static void subtestLogisticsMap(double[][] x, double[][] y, double[][] tx, double[][] ty, ITraining bprop)
+        private static void subtestLogisticsMap<T>(double[][] x, double[][] y, double[][] tx, double[][] ty, ITraining bprop) where T : IRule, new()
         {
             KMEANSExtractorIO extractor = new KMEANSExtractorIO(10);
             var timer = Stopwatch.StartNew();
-            ANFIS.ANFIS fis = ANFISFActory<GaussianRule2>.Build(x, y, extractor, bprop, 1000);
+            ANFIS.ANFIS fis = ANFISFActory<T>.Build(x, y, extractor, bprop, 1000);
             timer.Stop();
 
             double err = bprop.Error(tx, ty, fis.RuleBase);
 
-            Trace.WriteLine(string.Format("[{1}]\tLogistic map Error {0}\tElapsed {2}\tRuleBase {3}", err, bprop.GetType().Name, timer.Elapsed, fis.RuleBase.Length), "training");
+            Trace.WriteLine(string.Format("[{1} - {4}]\tLogistic map Error {0}\tElapsed {2}\tRuleBase {3}", err, bprop.GetType().Name, timer.Elapsed, fis.RuleBase.Length, typeof(T).Name), "training");
             Assert.IsFalse(err > 1e-2);
         }
 

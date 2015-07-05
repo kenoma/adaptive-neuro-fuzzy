@@ -133,12 +133,9 @@ Restart:
             return globalError / x.Length;
         }
 
-       private void checkStop(double globalError)
+        private void checkStop(double globalError)
         {
-            if (globalError < abstol)
-                isStop = true;
-
-            if (Math.Abs(lastError - globalError) < reltol)
+            if (globalError < abstol || Math.Abs(lastError - globalError) < reltol)
                 isStop = true;
 
             lastError = globalError;
@@ -281,7 +278,7 @@ Restart:
 
         public bool isAdjustingRules()
         {
-            return AddRule == null;
+            return AddRule != null;
         }
     }
 }
