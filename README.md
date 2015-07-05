@@ -12,6 +12,7 @@ Current version performs inference based on zero-order Sugeno fuzzy model (speci
 1. Perform clustering on datasets *x* and *y*, where *x* is an input dataset and *y* is a dataset of desired outputs . 
 2. Initialize fuzzy sets *A<sub>i</sub>* and consequences *B<sub>i</sub>* with use of obtained clusters.
 3. Tune ANFIS parameters with backprop in order to improve inference of the system.
+  0. (*Optional*) if during training occurs situation when input case if not firing any rule, than it is possible to add new rule to database.
 
 ###### Supported membership functions
 1. Triangle
