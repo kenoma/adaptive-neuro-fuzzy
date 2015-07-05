@@ -20,7 +20,7 @@ Current version performs inference based on zero-order Sugeno fuzzy model (speci
 3. Gaussian
 
 ###### Example of usage
-Following code generates training and test datasets of logistic map evolution in form *(x<sub>n-1</sub>, x<sub>n</sub>) → x<sub>n+1</sub>* and build ANFIS which can predict *x<sub>n+1</sub>* on two previouse values *(x<sub>n-1</sub>, x<sub>n</sub>)*.
+Following code generates training datasets of logistic map evolution in form *(x<sub>n-1</sub>, x<sub>n</sub>) → x<sub>n+1</sub>* and build ANFIS which can predict *x<sub>n+1</sub>* on two previouse values *(x<sub>n-1</sub>, x<sub>n</sub>)*.
 
 ```csharp
 int trainingSamples = 2000;
