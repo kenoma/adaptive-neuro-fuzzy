@@ -1,11 +1,11 @@
 # .NET ANFIS
 *This is WIP project*
 ###### About
-This C# implementation of ANFIS (Adaptive Neuro Fuzzy Inference System) is designed to solve task y=f(x) in form of IF–THEN rules 
+This C# implementation of ANFIS (Adaptive Neuro Fuzzy Inference System) is designed to solve task *y=f(x)* in form of IF–THEN rules 
 <blockquote><i>if x is A<sub>i</sub> then y is B<sub>i</sub></i></blockquote>
-where <i>x</i> is an <i>m</i> dimensional input vector, and <i>y</i> is an <i>n</i> dimensional vector of desired output, <i>A<sub>i</sub></i>  is fuzzy set and <i>B<sub>i</sub></i> is consequence part of i-th rule.
+where <i>x</i> is an <i>m</i> dimensional input vector, and <i>y</i> is an <i>n</i> dimensional vector of desired output, <i>A<sub>i</sub></i>  is fuzzy set and <i>B<sub>i</sub></i> is consequence part of *i*-th rule.
 
-Current version make inference on zero-order Sugeno fuzzy model (or special case of the Mamdani Fuzzy inference system).
+Current version performs inference based on zero-order Sugeno fuzzy model (special case of the Mamdani Fuzzy inference system).
 
 ###### Algorithm
 
