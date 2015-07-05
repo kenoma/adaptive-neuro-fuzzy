@@ -43,6 +43,12 @@ for (int i = 0; i < trainingSamples; i++)
 Backprop bprop = new Backprop(1e-2);
 ///initialize clustering algo which will provide us initial parameters for rules
 KMEANSExtractorIO extractor = new KMEANSExtractorIO(10);
-///Build IS with Triangle membershib functions
-ANFIS.ANFIS fis = ANFISFActory<LinearRule>.Build(x, y, extractor, bprop, 1000);
+///Build IS with Gaussian membershib functions
+ANFIS.ANFIS fis = ANFISFActory<GaussianRule>.Build(x, y, extractor, bprop, 1000);
+///[Backprop - GaussianRule] Error 0,000690883407351925	Elapsed 00:00:31.1691934	RuleBase 10
 ```
+Now you can use trained `fis` as folowing
+```csharp
+double[] y = fis.Inference(x);
+```
+For more examles look to `testANFIS.cs`.
