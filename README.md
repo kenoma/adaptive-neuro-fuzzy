@@ -45,7 +45,7 @@ Backprop bprop = new Backprop(1e-2);
 ///initialize clustering algo which will provide us initial parameters for rules
 KMEANSExtractorIO extractor = new KMEANSExtractorIO(10);
 ///Build IS with Gaussian membershib functions
-ANFIS.ANFIS fis = ANFISFActory<GaussianRule>.Build(x, y, extractor, bprop, 1000);
+ANFIS fis = ABuilder<GaussianRule>.Build(x, y, extractor, bprop, 1000);
 ///[Backprop - GaussianRule] Error 0,000690883407351925	Elapsed 00:00:31.1691934	RuleBase 10
 ```
 Now you can use trained `fis` as folowing
