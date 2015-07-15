@@ -20,7 +20,7 @@ Current version performs inference based on zero-order Sugeno fuzzy model (speci
 3. Gaussian
 
 ###### Example of usage
-Following code generates training datasets of logistic map evolution in form *(x<sub>n-1</sub>, x<sub>n</sub>) → x<sub>n+1</sub>* and build ANFIS which can predict *x<sub>n+1</sub>* on two previouse values *(x<sub>n-1</sub>, x<sub>n</sub>)*.
+Following code generates training datasets of logistic map evolution in form *(x<sub>n-1</sub>, x<sub>n</sub>) → x<sub>n+1</sub>* and build ANFIS which can predict *x<sub>n+1</sub>* on two previouse values *(x<sub>n-1</sub>, x<sub>n</sub>)* (testing and crossvalidation are omitted for simplicity).
 
 ```csharp
 int trainingSamples = 2000;
@@ -42,9 +42,12 @@ for (int i = 0; i < trainingSamples; i++)
 
 ///initialize trainig algorythm
 Backprop bprop = new Backprop(1e-2);
-///initialize clustering algo which will provide us initial parameters for rules
+///if during training you faced an unknown sample which is not firing any rule
+/// you can manage this situation with callback bprop.UnknownCaseFaced += .... ;
+
+///initialize clustering algo to provide initial rule set
 KMEANSExtractorIO extractor = new KMEANSExtractorIO(10);
-///Build IS with Gaussian membershib functions
+///Build IS with Gaussian membershib functions, backprop training and kmeans for rule initialization
 ANFIS fis = ABuilder<GaussianRule>.Build(x, y, extractor, bprop, 1000);
 ///[Backprop - GaussianRule] Error 0,000690883407351925	Elapsed 00:00:31.1691934	RuleBase 10
 ```
