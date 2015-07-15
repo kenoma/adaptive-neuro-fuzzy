@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ANFIS.misc;
+using NeuroFuzzy.misc;
 
-namespace ANFIS.rextractors
+namespace NeuroFuzzy.rextractors
 {
     static class sbsclust
     {

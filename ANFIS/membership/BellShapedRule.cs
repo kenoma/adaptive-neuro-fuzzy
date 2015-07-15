@@ -1,11 +1,11 @@
-﻿using ANFIS.misc;
+﻿using NeuroFuzzy.misc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ANFIS.membership
+namespace NeuroFuzzy.membership
 {
     public class BellShapedRule : IRule
     {

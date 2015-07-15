@@ -1,13 +1,13 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ANFIS.membership;
+using NeuroFuzzy.membership;
 using System.Collections.Generic;
-using ANFIS.training;
+using NeuroFuzzy.training;
 using System.Diagnostics;
 using System.Linq;
-using ANFIS;
-using ANFIS.rextractors;
-using ANFIS.misc;
+using NeuroFuzzy;
+using NeuroFuzzy.rextractors;
+using NeuroFuzzy.misc;
 
 namespace utest
 {
@@ -228,15 +228,15 @@ namespace utest
             }
 
             Backprop bprop = new Backprop(1e-2);
-            bprop.AddRule += AddRule<GaussianRule2>;
+            bprop.UnknownCaseFaced += AddRule<GaussianRule2>;
             BatchBackprop bbprop = new BatchBackprop(1e-2);
-            bbprop.AddRule += AddRule<GaussianRule2>;
+            bbprop.UnknownCaseFaced += AddRule<GaussianRule2>;
             QProp qprop = new QProp();
-            qprop.AddRule += AddRule<GaussianRule2>;
+            qprop.UnknownCaseFaced += AddRule<GaussianRule2>;
             StochasticBatch sprop = new StochasticBatch(500, 1e-2);
-            sprop.AddRule += AddRule<GaussianRule2>;
+            sprop.UnknownCaseFaced += AddRule<GaussianRule2>;
             StochasticQprop sqprop = new StochasticQprop(500);
-            sqprop.AddRule += AddRule<GaussianRule2>;
+            sqprop.UnknownCaseFaced += AddRule<GaussianRule2>;
 
             subtestLogisticsMap<LinearRule>(x, y, tx, ty, bprop);
             subtestLogisticsMap<LinearRule>(x, y, tx, ty, bbprop);
@@ -245,15 +245,15 @@ namespace utest
             subtestLogisticsMap<LinearRule>(x, y, tx, ty, sqprop);
 
             bprop = new Backprop(1e-2);
-            bprop.AddRule += AddRule<GaussianRule2>;
+            bprop.UnknownCaseFaced += AddRule<GaussianRule2>;
             bbprop = new BatchBackprop(1e-2);
-            bbprop.AddRule += AddRule<GaussianRule2>;
+            bbprop.UnknownCaseFaced += AddRule<GaussianRule2>;
             qprop = new QProp();
-            qprop.AddRule += AddRule<GaussianRule2>;
+            qprop.UnknownCaseFaced += AddRule<GaussianRule2>;
             sprop = new StochasticBatch(500, 1e-2);
-            sprop.AddRule += AddRule<GaussianRule2>;
+            sprop.UnknownCaseFaced += AddRule<GaussianRule2>;
             sqprop = new StochasticQprop(500);
-            sqprop.AddRule += AddRule<GaussianRule2>;
+            sqprop.UnknownCaseFaced += AddRule<GaussianRule2>;
 
             subtestLogisticsMap<GaussianRule>(x, y, tx, ty, bprop);
             subtestLogisticsMap<GaussianRule>(x, y, tx, ty, bbprop);
@@ -269,15 +269,15 @@ namespace utest
             int trainingSamples = IrisDataset.input.Length;
 
             Backprop bprop = new Backprop(1e-2, abstol: 1e-4, reltol: 1e-7, adjustThreshold: 1e-20);
-            bprop.AddRule += AddRule<GaussianRule2>;
+            bprop.UnknownCaseFaced += AddRule<GaussianRule2>;
             BatchBackprop bbprop = new BatchBackprop(1e-2, abstol: 1e-4, reltol: 1e-7, adjustThreshold: 1e-20);
-            bbprop.AddRule += AddRule<GaussianRule2>;
+            bbprop.UnknownCaseFaced += AddRule<GaussianRule2>;
             QProp qprop = new QProp(abstol: 1e-4, reltol: 1e-7, adjustThreshold: 1e-20, InitialLearningRate: 1e-4);
-            qprop.AddRule += AddRule<GaussianRule2>;
+            qprop.UnknownCaseFaced += AddRule<GaussianRule2>;
             StochasticBatch sprop = new StochasticBatch(40, 1e-2);
-            sprop.AddRule += AddRule<GaussianRule2>;
+            sprop.UnknownCaseFaced += AddRule<GaussianRule2>;
             StochasticQprop sqprop = new StochasticQprop(40);
-            sqprop.AddRule += AddRule<GaussianRule2>;
+            sqprop.UnknownCaseFaced += AddRule<GaussianRule2>;
 
             double[][] x;
             double[][] y;
@@ -328,10 +328,12 @@ namespace utest
         {
             KMEANSExtractorIO extractor = new KMEANSExtractorIO(10);
             var timer = Stopwatch.StartNew();
-            ANFIS.ANFIS fis = ANFISFActory<T>.Build(x, y, extractor, bprop, 1000);
+            ANFIS fis = ABuilder<T>.Build(x, y, extractor, bprop, 1000);
             timer.Stop();
 
             double err = bprop.Error(tx, ty, fis.RuleBase);
+
+            
 
             Trace.WriteLine(string.Format("[{1} - {4}]\tLogistic map Error {0}\tElapsed {2}\tRuleBase {3}", err, bprop.GetType().Name, timer.Elapsed, fis.RuleBase.Length, typeof(T).Name), "training");
             Assert.IsFalse(err > 1e-2);
@@ -339,9 +341,10 @@ namespace utest
 
         private static void subtestIris(double[][] x, double[][] y, double[][] tx, double[][] ty, ITraining bprop)
         {
+
             KMEANSExtractorI extractor = new KMEANSExtractorI(15);
             var timer = Stopwatch.StartNew();
-            ANFIS.ANFIS fis = ANFISFActory<GaussianRule2>.Build(x, y, extractor, bprop, 1000);
+            ANFIS fis = ABuilder<GaussianRule2>.Build(x, y, extractor, bprop, 1000);
             timer.Stop();
 
             double err = bprop.Error(tx, ty, fis.RuleBase);

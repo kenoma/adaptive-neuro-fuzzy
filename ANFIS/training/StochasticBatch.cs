@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ANFIS.misc;
+using NeuroFuzzy.misc;
 
-namespace ANFIS.training
+namespace NeuroFuzzy.training
 {
     public class StochasticBatch : ITraining
     {
@@ -30,7 +30,7 @@ namespace ANFIS.training
         {
             isStop = false;
             if (!bprop.isAdjustingRules() && isAdjustingRules())
-                bprop.AddRule += AddRule;
+                bprop.UnknownCaseFaced += UnknownCaseFaced;
 
             var seq = x.Select((z, i) => i).ToArray();
             seq.Shuffle();
@@ -69,7 +69,7 @@ namespace ANFIS.training
             return bprop.Error(x, y, RuleBase);
         }
 
-        public event AdjustRuleBase AddRule;
+        public event UnknownCase UnknownCaseFaced;
 
         public bool isTrainingstoped()
         {
@@ -79,7 +79,7 @@ namespace ANFIS.training
 
         public bool isAdjustingRules()
         {
-            return AddRule != null;
+            return UnknownCaseFaced != null;
         }
     }
 }

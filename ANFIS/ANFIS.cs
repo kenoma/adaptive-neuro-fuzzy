@@ -4,11 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ANFIS
+namespace NeuroFuzzy
 {
-    /// <summary>
-    /// 
-    /// </summary>
+
     public class ANFIS
     {
         private int inputDim, outputDim, numOfRules;

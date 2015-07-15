@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ANFIS.misc;
+using NeuroFuzzy.misc;
 
-namespace ANFIS.rextractors
+namespace NeuroFuzzy.rextractors
 {
 
     enum kmeansType
@@ -53,7 +53,7 @@ namespace ANFIS.rextractors
         {
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
             double[][] m = null;
-            Console.WriteLine("Initialization...");
+            //Console.WriteLine("Initialization...");
             switch (initType)
             {
                 case kmeansType.Forgy: m = ForgyInit(x, k); break;
@@ -79,14 +79,14 @@ namespace ANFIS.rextractors
                         m = Update(x, m, a, ntu, k);
                     int unmoved = ntu.Count(z => !z);
 
-                    Console.WriteLine("\r[{4} ms] Iteration {0}, reassigned {1} unmoved {2} Time {3} ms     ", iters++, reassigned, unmoved, sw.ElapsedMilliseconds, (DateTime.Now - start).TotalMilliseconds);
+                    //Console.WriteLine("\r[{4} ms] Iteration {0}, reassigned {1} unmoved {2} Time {3} ms     ", iters++, reassigned, unmoved, sw.ElapsedMilliseconds, (DateTime.Now - start).TotalMilliseconds);
                
                     if (reassigned != 0)
                         confirmations = 0;
                 }
                 while (reassigned != 0);
                 confirmations++;
-                Console.WriteLine("CONFIRAMTION {0}", confirmations);
+                //Console.WriteLine("CONFIRMATION {0}", confirmations);
             } while (confirmations < 2);
 
             error = Error(x, m, a);
@@ -225,7 +225,7 @@ namespace ANFIS.rextractors
                 theta = theta.Select(z => z >= 0.8 * tmax ? z : 0.0).ToArray();
                 int cand = probt(theta, rnd);
                 m.Add(x[cand]);
-                Console.Write("\r{0} seed...                   ", c);
+                //Console.Write("\r{0} seed...                   ", c);
             }
 
             return m.ToArray();

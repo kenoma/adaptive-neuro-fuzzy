@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ANFIS.misc;
-namespace ANFIS.rextractors
+using NeuroFuzzy.misc;
+namespace NeuroFuzzy.rextractors
 {
     public class sbstrExtractor : IRuleExtractor
     {

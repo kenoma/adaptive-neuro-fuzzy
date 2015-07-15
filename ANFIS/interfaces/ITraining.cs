@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ANFIS
+namespace NeuroFuzzy
 {
-    public delegate void AdjustRuleBase(IList<IRule> RuleBase, double[] centroid, double[] consequence, double[] neighbourhood);
+    public delegate void UnknownCase(IList<IRule> RuleBase, double[] centroid, double[] consequence, double[] neighbourhood);
     public interface ITraining
     {
         /// <summary>
@@ -19,7 +19,7 @@ namespace ANFIS
         /// <returns>Iteration Error</returns>
         double Iteration(double[][] x, double[][] y, IList<IRule> RuleBase);
         double Error(double[][] x, double[][] y, IList<IRule> RuleBase);
-        event AdjustRuleBase AddRule;
+        event UnknownCase UnknownCaseFaced;
         bool isTrainingstoped();
         bool isAdjustingRules();
     }

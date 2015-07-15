@@ -1,15 +1,15 @@
-﻿using ANFIS.misc;
+﻿using NeuroFuzzy.misc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ANFIS.training
+namespace NeuroFuzzy.training
 {
     public class BatchBackprop : ITraining
     {
-        public event AdjustRuleBase AddRule;
+        public event UnknownCase UnknownCaseFaced;
         double learningRate = 1e-10;
         double lastError = double.MaxValue;
         double abstol, reltol, adjustThreshold;
@@ -26,7 +26,7 @@ namespace ANFIS.training
 
         public double Iteration(double[][] x, double[][] y, IList<IRule> ruleBase)
         {
-Restart:
+        Restart:
             isStop = false;
             if (x.Length != y.Length)
                 throw new Exception("Input and desired output lengths not match");
@@ -44,7 +44,7 @@ Restart:
                 z_accum[i] = new double[outputDim];
                 p_accum[i] = new double[ruleBase[i].Parameters.Length];
             }
-            
+
             double globalError = 0.0;
             double[] firings = new double[numOfRules];
 
@@ -59,10 +59,10 @@ Restart:
                     firingSum += firings[i];
                 }
 
-                if (AddRule != null && firingSum < adjustThreshold)
+                if (UnknownCaseFaced != null && firingSum < adjustThreshold)
                 {
                     int neig = math.NearestNeighbourhood(ruleBase.Select(z => z.Centroid).ToArray(), x[sample]);
-                    AddRule(ruleBase, x[sample], y[sample], ruleBase[neig].Centroid);
+                    UnknownCaseFaced(ruleBase, x[sample], y[sample], ruleBase[neig].Centroid);
                     Console.WriteLine("Adjusting rule base. Now {0} are in base.", ruleBase.Count);
                     goto Restart;
                 }
@@ -91,32 +91,26 @@ Restart:
                     globalError += Math.Abs(o[C] - y[sample][C]);
             }
 
-            double escale = 0.0;
-            for (int rule = 0; rule < ruleBase.Count; rule++)
-                for (int p = 0; p < ruleBase[rule].Parameters.Length; p++)
-                    escale += p_accum[rule][p] * p_accum[rule][p];
-
-            for (int i = 0; i < numOfRules; i++)
-                for (int C = 0; C < outputDim; C++)
-                    escale += z_accum[i][C] * z_accum[i][C];
-
-            escale = Math.Sqrt(escale);
-
-            for (int rule = 0; rule < ruleBase.Count; rule++)
+            globalError /= x.Length;
+            double tmpError = globalError * 2;
+            while (tmpError > globalError && Math.Abs(globalError - tmpError) > reltol && globalError > abstol)
             {
-                double[] parm = ruleBase[rule].Parameters;
-                for (int p = 0; p < parm.Length; p++)
-                    parm[p] -= learningRate * p_accum[rule][p] / escale;
+                for (int rule = 0; rule < ruleBase.Count; rule++)
+                {
+                    double[] parm = ruleBase[rule].Parameters;
+                    for (int p = 0; p < parm.Length; p++)
+                        parm[p] -= learningRate * p_accum[rule][p] / x.Length;
+                }
+
+                for (int i = 0; i < numOfRules; i++)
+                    for (int C = 0; C < outputDim; C++)
+                        ruleBase[i].Z[C] -= learningRate * z_accum[i][C] / x.Length;
+
+                tmpError = globalError;
+                globalError = Error(x, y, ruleBase);
             }
-
-            for (int i = 0; i < numOfRules; i++)
-                for (int C = 0; C < outputDim; C++)
-                    ruleBase[i].Z[C] -= learningRate * z_accum[i][C] / escale;
-
-
             checkStop(globalError);
-
-            return globalError / x.Length;
+            return globalError;
         }
 
         private void checkStop(double globalError)
@@ -189,7 +183,7 @@ Restart:
 
         public bool isAdjustingRules()
         {
-            return AddRule != null;
+            return UnknownCaseFaced != null;
         }
     }
 }

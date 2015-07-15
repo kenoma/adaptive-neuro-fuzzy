@@ -1,11 +1,11 @@
-﻿using ANFIS.misc;
+﻿using NeuroFuzzy.misc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ANFIS.training
+namespace NeuroFuzzy.training
 {
     public class Backprop : ITraining
     {
@@ -14,7 +14,7 @@ namespace ANFIS.training
         double abstol, reltol, adjustThreshold;
         bool isStop = false;
 
-        public event AdjustRuleBase AddRule;
+        public event UnknownCase UnknownCaseFaced;
 
         public Backprop(double LearningRate, double abstol = 1e-4, double reltol = 1e-7, double adjustThreshold=1e-15)
         {
@@ -52,10 +52,10 @@ Restart:
                     firingSum += firings[i];
                 }
 
-                if (AddRule != null && firingSum < adjustThreshold)
+                if (UnknownCaseFaced != null && firingSum < adjustThreshold)
                 {
                     int neig = math.NearestNeighbourhood(ruleBase.Select(z => z.Centroid).ToArray(), x[sample]);
-                    AddRule(ruleBase, x[sample], y[sample], ruleBase[neig].Centroid);
+                    UnknownCaseFaced(ruleBase, x[sample], y[sample], ruleBase[neig].Centroid);
                     Console.WriteLine("Adjusting rule base. Now {0} are in base.", ruleBase.Count);
                     goto Restart;
                 }
@@ -163,7 +163,7 @@ Restart:
 
         public bool isAdjustingRules()
         {
-            return AddRule != null;
+            return UnknownCaseFaced != null;
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ANFIS.misc
+namespace NeuroFuzzy.misc
 {
     public static class math
     {
