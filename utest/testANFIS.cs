@@ -17,6 +17,7 @@ namespace utest
         [TestMethod]
         public void TestOptimization1()
         {
+
             Backprop bprop = new Backprop(1e-2);
             BatchBackprop bbprop = new BatchBackprop(1e-2);
             QProp qprop = new QProp();
