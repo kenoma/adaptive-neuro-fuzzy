@@ -27,20 +27,6 @@ namespace NeuroFuzzy
             stream.Close();
             return mp;
         }
-
-        //public static void SerializefzProtoBuf(T pObject, string filename)
-        //{
-        //    using (System.IO.FileStream fs = new System.IO.FileStream(filename, System.IO.FileMode.Create))
-        //        ProtoBuf.Serializer.Serialize(fs, pObject);
-        //}
-
-        //public static T DeserializefzProtobuf(string filename)
-        //{
-        //    T tr;
-        //    using (System.IO.FileStream fs = new System.IO.FileStream(filename, System.IO.FileMode.Open))
-        //        tr = ProtoBuf.Serializer.Deserialize<T>(fs);
-        //    return tr;
-        //}
     }
 
 }

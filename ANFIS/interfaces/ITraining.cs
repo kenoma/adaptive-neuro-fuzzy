@@ -15,12 +15,34 @@ namespace NeuroFuzzy
         /// <param name="x">Input</param>
         /// <param name="y">Desired output</param>
         /// <param name="z">consequent parts of rules</param>
-        /// <param name="RuleBase">Set of rules - i.e. membership function parameters+consequence part of rule</param>
+        /// <param name="RuleBase">Set of rules with membership function parameters and consequences</param>
         /// <returns>Iteration Error</returns>
         double Iteration(double[][] x, double[][] y, IList<IRule> RuleBase);
+
+        /// <summary>
+        /// Overall error of FIS
+        /// </summary>
+        /// <param name="x">inputs</param>
+        /// <param name="y">desired outputs</param>
+        /// <param name="RuleBase">Rule set of FIS</param>
+        /// <returns></returns>
         double Error(double[][] x, double[][] y, IList<IRule> RuleBase);
+
+        /// <summary>
+        /// Event to manage situation when no one rule from database is sure for specific input
+        /// </summary>
         event UnknownCase UnknownCaseFaced;
+
+        /// <summary>
+        /// Inform about training process
+        /// </summary>
+        /// <returns></returns>
         bool isTrainingstoped();
+
+        /// <summary>
+        /// Informs if during training we are managing unknown cases
+        /// </summary>
+        /// <returns></returns>
         bool isAdjustingRules();
     }
 }

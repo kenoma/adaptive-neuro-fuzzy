@@ -40,7 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ANFIS.cs" />
-    <Compile Include="ANFISFActory.cs" />
+    <Compile Include="ABuilder.cs" />
     <Compile Include="interfaces\IRuleExtractor.cs" />
     <Compile Include="interfaces\ITerm.cs" />
     <Compile Include="interfaces\ITraining.cs" />

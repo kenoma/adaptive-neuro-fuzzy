@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace NeuroFuzzy.membership
 {
+    /// <summary>
+    /// Bell shaped membership function and its parameters and gradients
+    /// mu = 1/(1+(||x-c||/a)^(2b))
+    /// </summary>
     public class BellShapedRule : IRule
     {
         int xdim;
@@ -15,6 +19,12 @@ namespace NeuroFuzzy.membership
         double[] centroid;
         double[] z;
 
+        /// <summary>
+        /// Initialization of bellshaped function
+        /// </summary>
+        /// <param name="Centroid">Centroid of memb function</param>
+        /// <param name="Consequence">Consequence from rule</param>
+        /// <param name="NearestNeighb">Nearest centroid of another rule</param>
         public void Init(double[] Centroid, double[] Consequence, double[] NearestNeighb)
         {
             if (Centroid == null || Centroid.Length == 0 || Consequence == null)
@@ -36,6 +46,10 @@ namespace NeuroFuzzy.membership
             z = Consequence.ToArray();
         }
 
+        /// <summary>
+        /// Parameters of bell shaped function, packed into array
+        /// First n elements are rule centroid components and last two are 'a' and 'b' parameters resp.
+        /// </summary>
         public double[] Parameters
         {
             get
@@ -48,7 +62,9 @@ namespace NeuroFuzzy.membership
             }
         }
 
-
+        /// <summary>
+        /// Centroid part of rule
+        /// </summary>
         public double[] Centroid
         {
             get
@@ -59,6 +75,9 @@ namespace NeuroFuzzy.membership
             private set { }
         }
 
+        /// <summary>
+        /// Consequence part of rule
+        /// </summary>
         public double[] Z
         {
             get
@@ -89,6 +108,11 @@ namespace NeuroFuzzy.membership
             return 1.0 / (1.0 + sum);
         }
 
+        /// <summary>
+        /// Gradient for memb. function parameters
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
         public double[] GetGradient(double[] point)
         {
             double[] grad = new double[xdim + 2];
@@ -113,8 +137,5 @@ namespace NeuroFuzzy.membership
         {
             return x * x;
         }
-
-
-
     }
 }

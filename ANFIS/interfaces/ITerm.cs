@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace NeuroFuzzy
 {
+    /// <summary>
+    /// Single rule for FIS with membership function parameters, consequences and rule itself
+    /// </summary>
     public interface IRule
     {
 
