@@ -55,4 +55,4 @@ Now you can use trained `fis` as folowing
 ```csharp
 double[] y = fis.Inference(x);
 ```
-For more examles look to `testANFIS.cs`.
+For more examples look to `testANFIS.cs`.
