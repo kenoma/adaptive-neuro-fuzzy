@@ -31,7 +31,7 @@ double px = 0.1;
 double r = 3.8;
 double lx = r * px * (1 - px);
 
-///generate training set
+//generate training set
 for (int i = 0; i < trainingSamples; i++)
 {
     x[i] = new double[] { px, lx };
@@ -40,19 +40,19 @@ for (int i = 0; i < trainingSamples; i++)
     y[i] = new double[] { lx };
 }
 
-///initialize trainig algorythm
+//initialize trainig algorithm
 Backprop bprop = new Backprop(1e-2);
-///if during training you faced an unknown sample which is not firing any rule
-/// you can manage this situation with callback bprop.UnknownCaseFaced += .... ;
+//if during training you faced an unknown sample which is not firing any rule
+// you can manage this situation with callback bprop.UnknownCaseFaced += .... ;
 
-///initialize clustering algo to provide initial rule set
+//initialize clustering algo to provide initial rule set
 KMEANSExtractorIO extractor = new KMEANSExtractorIO(10);
-///Build IS with Gaussian membershib functions, backprop training and kmeans for rule initialization
+//Build IS with Gaussian membershib functions, backprop training and kmeans for rule initialization
 ANFIS fis = ABuilder<GaussianRule>.Build(x, y, extractor, bprop, 1000);
-///[Backprop - GaussianRule] Error 0,000690883407351925	Elapsed 00:00:31.1691934	RuleBase 10
+//[Backprop - GaussianRule] Error 0,000690883407351925	Elapsed 00:00:31.1691934	RuleBase 10
 ```
 Now you can use trained `fis` as folowing
 ```csharp
 double[] y = fis.Inference(x);
 ```
-For more examples look to `testANFIS.cs`.
+For more examples look into `testANFIS.cs`.
