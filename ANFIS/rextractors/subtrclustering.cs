@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NeuroFuzzy.misc;
+using NLog;
 
 namespace NeuroFuzzy.rextractors
 {
     static class sbsclust
     {
         static object o = new object();
-
+        static Logger _log = LogManager.GetLogger("sbsclust");
         static public double[][] SubstractiveClustering(double[][] x, double arad, double brad)
         {
             double[] P = new double[x.Length];
@@ -32,7 +33,7 @@ namespace NeuroFuzzy.rextractors
                     }
                     if (progress++ % 100 == 0)
                     {
-                        Console.Write("\rPotential {0}/{1}", progress, x.Length);
+                        _log.Info($"Potential {progress}/{x.Length}");
                     }
                 });
 
@@ -45,7 +46,7 @@ namespace NeuroFuzzy.rextractors
             c.Add(wn);
             while (D > cap)
             {
-                Console.Write("\rIteration {0} [{1} cap {2}]        ", c.Count, D, cap);
+                _log.Info($"Iteration {c.Count} [{D} cap {cap}]");
                 progress = 0;
                 Parallel.For(0, x.Length, row =>
                 {

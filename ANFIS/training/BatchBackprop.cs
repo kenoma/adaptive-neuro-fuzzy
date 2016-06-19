@@ -1,4 +1,5 @@
 ﻿using NeuroFuzzy.misc;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace NeuroFuzzy.training
 {
     public class BatchBackprop : ITraining
     {
+        Logger _log;
         public event UnknownCase UnknownCaseFaced;
         double learningRate = 1e-10;
         double lastError = double.MaxValue;
@@ -18,6 +20,7 @@ namespace NeuroFuzzy.training
 
         public BatchBackprop(double LearningRate, double abstol = 1e-5, double reltol = 1e-7, double adjustThreshold=1e-15)
         {
+            _log = LogManager.GetLogger(this.GetType().Name);
             this.learningRate = LearningRate;
             this.abstol = abstol;
             this.reltol = reltol;
@@ -63,7 +66,7 @@ namespace NeuroFuzzy.training
                 {
                     int neig = math.NearestNeighbourhood(ruleBase.Select(z => z.Centroid).ToArray(), x[sample]);
                     UnknownCaseFaced(ruleBase, x[sample], y[sample], ruleBase[neig].Centroid);
-                    Console.WriteLine("Adjusting rule base. Now {0} are in base.", ruleBase.Count);
+                    _log.Info("Adjusting rule base. Now {0} are in base.", ruleBase.Count);
                     goto Restart;
                 }
 

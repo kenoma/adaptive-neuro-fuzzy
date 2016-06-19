@@ -9,6 +9,7 @@ namespace NeuroFuzzy.training
 {
     public class StochasticBatch : ITraining
     {
+        
         int RandomSampleSize = 100;
         double learningRate = 1e-10;
         double lastError = double.MaxValue;

@@ -1,4 +1,5 @@
 ﻿using NeuroFuzzy.misc;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace NeuroFuzzy.training
 {
     public class QProp : ITraining
     {
+        Logger _log;
         public event UnknownCase UnknownCaseFaced;
 
         double etaPlus, etaMinus,deltaMax,deltaMin,defLRate;
@@ -29,6 +31,7 @@ namespace NeuroFuzzy.training
         /// <param name="InitialLearningRate">Default learning rate</param>
         public QProp(double abstol = 1e-5, double reltol = 1e-7, double EtaPlus = 1.2, double EtaMinus = 0.5, double DeltaMax = 1, double DeltaMin = 1e-8, double InitialLearningRate = 1e-4, double adjustThreshold = 1e-15)
         {
+            _log = LogManager.GetLogger(this.GetType().Name);
             this.etaMinus = EtaMinus;
             this.etaPlus = EtaPlus;
             this.deltaMax = DeltaMax;
@@ -79,7 +82,7 @@ Restart:
                 {
                     int neig = math.NearestNeighbourhood(ruleBase.Select(z => z.Centroid).ToArray(), x[sample]);
                     UnknownCaseFaced(ruleBase, x[sample], y[sample], ruleBase[neig].Centroid);
-                    Console.WriteLine("Adjusting rule base. Now {0} are in base.", ruleBase.Count);
+                    _log.Info("Adjusting rule base. Now {0} are in base.", ruleBase.Count);
                     lRatesConseq = null;
                     lRatesParams = null;
                     prev_p_accum = null;

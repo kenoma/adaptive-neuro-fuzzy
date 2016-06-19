@@ -1,4 +1,5 @@
 ﻿using NeuroFuzzy.misc;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,25 +10,28 @@ namespace NeuroFuzzy.training
 {
     public class Backprop : ITraining
     {
-        double learningRate = 1e-10;
-        double lastError = double.MaxValue;
-        double abstol, reltol, adjustThreshold;
-        bool isStop = false;
+        Logger _log;
+
+        private double _learningRate = 1e-10;
+        private double _lastError = double.MaxValue;
+        private double _abstol, _reltol, _adjustThreshold;
+        private bool _isStop = false;
 
         public event UnknownCase UnknownCaseFaced;
 
-        public Backprop(double LearningRate, double abstol = 1e-4, double reltol = 1e-7, double adjustThreshold=1e-15)
+        public Backprop(double LearningRate, double abstol = 1e-4, double reltol = 1e-7, double adjustThreshold = 1e-15)
         {
-            this.learningRate = LearningRate;
-            this.abstol = abstol;
-            this.reltol = reltol;
-            this.adjustThreshold = adjustThreshold;
+            _log = LogManager.GetLogger(this.GetType().Name);
+            this._learningRate = LearningRate;
+            this._abstol = abstol;
+            this._reltol = reltol;
+            this._adjustThreshold = adjustThreshold;
         }
 
         public double Iteration(double[][] x, double[][] y, IList<IRule> ruleBase)
         {
 Restart:
-            isStop = false;
+            _isStop = false;
             
             if (x.Length != y.Length)
                 throw new Exception("Input and desired output lengths not match");
@@ -52,11 +56,11 @@ Restart:
                     firingSum += firings[i];
                 }
 
-                if (UnknownCaseFaced != null && firingSum < adjustThreshold)
+                if (UnknownCaseFaced != null && firingSum < _adjustThreshold)
                 {
                     int neig = math.NearestNeighbourhood(ruleBase.Select(z => z.Centroid).ToArray(), x[sample]);
                     UnknownCaseFaced(ruleBase, x[sample], y[sample], ruleBase[neig].Centroid);
-                    Console.WriteLine("Adjusting rule base. Now {0} are in base.", ruleBase.Count);
+                    _log.Info("Adjusting rule base. Now {0} are in base.", ruleBase.Count);
                     goto Restart;
                 }
 
@@ -73,14 +77,14 @@ Restart:
                     {
                         double g = dEdP(y[sample], o, ruleBase, firings, grad, firingSum, rule, outputDim, numOfRules, p);
 
-                        parm[p] -= learningRate * g;
+                        parm[p] -= _learningRate * g;
                     }
                 }
 
                 for (int i = 0; i < numOfRules; i++)
                     for (int C = 0; C < outputDim; C++)
                     {
-                        ruleBase[i].Z[C] -= learningRate * (o[C] - y[sample][C]) * firings[i] / firingSum;
+                        ruleBase[i].Z[C] -= _learningRate * (o[C] - y[sample][C]) * firings[i] / firingSum;
                     }
 
                 for (int C = 0; C < outputDim; C++)
@@ -96,13 +100,13 @@ Restart:
 
         private void checkStop(double globalError)
         {
-            if (globalError < abstol)
-                isStop = true;
+            if (globalError < _abstol)
+                _isStop = true;
 
-            if (Math.Abs(lastError - globalError) < reltol)
-                isStop = true;
+            if (Math.Abs(_lastError - globalError) < _reltol)
+                _isStop = true;
 
-            lastError = globalError;
+            _lastError = globalError;
         }
 
         private static double dEdP(double[] y, double[] o,
@@ -133,7 +137,7 @@ Restart:
 
         public bool isTrainingstoped()
         {
-            return isStop;
+            return _isStop;
         }
 
 

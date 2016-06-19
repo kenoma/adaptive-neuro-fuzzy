@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NeuroFuzzy.misc;
+using NLog;
 
 namespace NeuroFuzzy.rextractors
 {
@@ -17,6 +18,7 @@ namespace NeuroFuzzy.rextractors
 
     static class kmeans
     {
+        static Logger _log = LogManager.GetLogger("kmeans");
         static object o = new object();
 
         public static double[][] clustering(double[,] x, int k, int restarts, kmeansType initType)
@@ -37,11 +39,11 @@ namespace NeuroFuzzy.rextractors
             double[] error = new double[restarts];
             for (int r = 0; r < restarts; r++)
             {
-                Console.Write("\rRestart {0}", r);
+                _log.Info($"Restart {r}");
                 double er = 0.0;
                 pool[r] = clustering(x, k, initType, out er);
                 error[r] = er;
-                Console.Write("\rError {0}", er);
+                _log.Info($"Error {er}");
             }
             double min = error.Min();
             int opt = error.FindIndex(z => z == min);
@@ -79,14 +81,14 @@ namespace NeuroFuzzy.rextractors
                         m = Update(x, m, a, ntu, k);
                     int unmoved = ntu.Count(z => !z);
 
-                    //Console.WriteLine("\r[{4} ms] Iteration {0}, reassigned {1} unmoved {2} Time {3} ms     ", iters++, reassigned, unmoved, sw.ElapsedMilliseconds, (DateTime.Now - start).TotalMilliseconds);
+                    _log.Info($"[{(DateTime.Now - start).TotalMilliseconds} ms] Iteration {iters++}, reassigned {reassigned} unmoved {unmoved} Time {sw.ElapsedMilliseconds} ms     ");
                
                     if (reassigned != 0)
                         confirmations = 0;
                 }
                 while (reassigned != 0);
                 confirmations++;
-                //Console.WriteLine("CONFIRMATION {0}", confirmations);
+                _log.Info($"CONFIRMATION {confirmations}");
             } while (confirmations < 2);
 
             error = Error(x, m, a);
