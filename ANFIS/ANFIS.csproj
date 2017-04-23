@@ -48,7 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ANFIS.cs" />
-    <Compile Include="ABuilder.cs" />
+    <Compile Include="ANFISBuilder.cs" />
     <Compile Include="interfaces\IRuleExtractor.cs" />
     <Compile Include="interfaces\IRule.cs" />
     <Compile Include="interfaces\ITraining.cs" />

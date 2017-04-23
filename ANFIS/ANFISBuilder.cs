@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace NeuroFuzzy
 {
-    public static class ABuilder<R>
+    public static class ANFISBuilder<R>
         where R : IRule, new()
     {
         static Logger _log = LogManager.GetLogger("ABuilder");

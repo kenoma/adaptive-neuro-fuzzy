@@ -329,7 +329,7 @@ namespace utest
         {
             KMEANSExtractorIO extractor = new KMEANSExtractorIO(10);
             var timer = Stopwatch.StartNew();
-            ANFIS fis = ABuilder<T>.Build(x, y, extractor, bprop, 1000);
+            ANFIS fis = ANFISBuilder<T>.Build(x, y, extractor, bprop, 1000);
             timer.Stop();
 
             double err = bprop.Error(tx, ty, fis.RuleBase);
@@ -345,7 +345,7 @@ namespace utest
 
             KMEANSExtractorI extractor = new KMEANSExtractorI(15);
             var timer = Stopwatch.StartNew();
-            ANFIS fis = ABuilder<GaussianRule2>.Build(x, y, extractor, bprop, 1000);
+            ANFIS fis = ANFISBuilder<GaussianRule2>.Build(x, y, extractor, bprop, 1000);
             timer.Stop();
 
             double err = bprop.Error(tx, ty, fis.RuleBase);
